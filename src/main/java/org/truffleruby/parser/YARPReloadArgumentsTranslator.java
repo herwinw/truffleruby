@@ -56,18 +56,18 @@ public final class YARPReloadArgumentsTranslator extends YARPBaseTranslator {
         final List<RubyNode> sequence = new ArrayList<>();
 
         for (var node : parameters.requireds) {
-            sequence.add(node.accept(this)); // Nodes.RequiredParameterNode, Nodes.MultiTargetNode are expected here
+            sequence.add(node.accept(this));
             index++;
         }
 
         for (var node : parameters.optionals) {
-            sequence.add(node.accept(this)); // Nodes.OptionalParameterNode is expected here
+            sequence.add(node.accept(this));
             index++;
         }
 
         if (parameters.rest != null) {
             restParameterIndex = index;
-            sequence.add(parameters.rest.accept(this)); // Nodes.RestParameterNode is expected here
+            sequence.add(parameters.rest.accept(this));
         }
 
         index = -1;
@@ -75,7 +75,7 @@ public final class YARPReloadArgumentsTranslator extends YARPBaseTranslator {
         // iterate them in the same order to handle multiple "_" properly
         ArrayList<RubyNode> postsSequence = new ArrayList<>();
         for (int i = parameters.posts.length - 1; i >= 0; i--) {
-            postsSequence.add(parameters.posts[i].accept(this)); // Nodes.RequiredParameterNode, Nodes.MultiTargetNode are expected here
+            postsSequence.add(parameters.posts[i].accept(this));
             index--;
         }
         // but we need to pass parameters to super call in direct order
@@ -89,7 +89,6 @@ public final class YARPReloadArgumentsTranslator extends YARPBaseTranslator {
             RubyNode[] keysAndValues = new RubyNode[keywordsCount * 2];
 
             for (int i = 0; i < keywordsCount; i++) {
-                // Nodes.RequiredKeywordParameterNode/Nodes.OptionalKeywordParameterNode are expected here
                 final Nodes.Node keyword = parameters.keywords[i];
 
                 final String name;

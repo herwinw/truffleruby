@@ -74,7 +74,7 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
             state = State.PRE;
             index = 0;
             for (var node : parameters.requireds) {
-                sequence.add(node.accept(this)); // Nodes.RequiredParameterNode is expected here
+                sequence.add(node.accept(this));
                 index++;
             }
         }
@@ -82,7 +82,7 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
         if (parameters.optionals.length > 0) {
             index = parameters.requireds.length;
             for (var node : parameters.optionals) {
-                sequence.add(node.accept(this)); // Nodes.OptionalParameterNode is expected here
+                sequence.add(node.accept(this));
                 index++;
             }
         }
@@ -94,7 +94,7 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
                 // The only reason to save anonymous rest parameter in a local variable is to be able to forward it.
                 // Implicit rest is allowed only in blocks but anonymous rest forwarding works only in methods/lambdas.
             } else {
-                sequence.add(parameters.rest.accept(this)); // Nodes.RestParameterNode is expected here
+                sequence.add(parameters.rest.accept(this));
             }
         }
 
@@ -103,17 +103,16 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
             index = -1;
 
             for (int i = parameters.posts.length - 1; i >= 0; i--) {
-                sequence.add(parameters.posts[i].accept(this)); // Nodes.RequiredParameterNode is expected here
+                sequence.add(parameters.posts[i].accept(this));
                 index--;
             }
         }
 
         for (var node : parameters.keywords) {
-            sequence.add(node.accept(this)); // Nodes.OptionalKeywordParameterNode is expected here
+            sequence.add(node.accept(this));
         }
 
         if (parameters.keyword_rest != null) {
-            // Nodes.KeywordRestParameterNode/Nodes.NoKeywordsParameterNode are expected here
             sequence.add(parameters.keyword_rest.accept(this));
         }
 
