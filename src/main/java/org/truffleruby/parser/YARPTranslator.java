@@ -1853,7 +1853,10 @@ public class YARPTranslator extends YARPBaseTranslator {
 
         final RubyNode[] reloadSequence = reloadTranslator.reload(parametersNode);
 
-        var descriptor = (parametersNode.keywords.length > 0 || parametersNode.keyword_rest != null)
+        boolean hasKeywords = parametersNode.keywords.length > 0 ||
+                (parametersNode.keyword_rest != null &&
+                        !(parametersNode.keyword_rest instanceof Nodes.NoKeywordsParameterNode));
+        var descriptor = hasKeywords
                 ? KeywordArgumentsDescriptor.EMPTY
                 : NoKeywordArgumentsDescriptor.INSTANCE;
         final int restParamIndex = reloadTranslator.getRestParameterIndex();

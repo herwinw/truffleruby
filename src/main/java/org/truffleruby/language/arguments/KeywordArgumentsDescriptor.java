@@ -18,6 +18,7 @@ import org.truffleruby.core.string.StringUtils;
  * arguments were passed. The callee must handle that for now. */
 public final class KeywordArgumentsDescriptor extends ArgumentsDescriptor {
 
+    /** Used to mean there are keyword arguments, but they are unknown (e.g. foo(**kw)). */
     public static final KeywordArgumentsDescriptor EMPTY = new KeywordArgumentsDescriptor(
             StringUtils.EMPTY_STRING_ARRAY);
 

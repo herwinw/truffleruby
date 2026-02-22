@@ -79,7 +79,7 @@ ast: |
                                               ReadUserKeywordsHashNode
                                   SuperCallNode
                                       attributes:
-                                          descriptor = KeywordArgumentsDescriptor(keywords = [])
+                                          descriptor = NoKeywordArgumentsDescriptor
                                           emptyKeywordsProfile = false
                                           flags = 1
                                           isSplatted = false
