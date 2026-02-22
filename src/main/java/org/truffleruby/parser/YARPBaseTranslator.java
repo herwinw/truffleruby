@@ -289,4 +289,14 @@ public abstract class YARPBaseTranslator extends AbstractNodeVisitor<RubyNode> {
         return rubyNodes;
     }
 
+    public static boolean hasKeywordArguments(Nodes.ParametersNode node) {
+        return node.keywords.length != 0 || hasKeywordsRest(node);
+    }
+
+    // This is more error-prone than one might expect due to NoKeywordsParameterNode,
+    // so we provide a helper and reviewed all usages of ParametersNode#keyword_rest.
+    public static boolean hasKeywordsRest(Nodes.ParametersNode node) {
+        return node.keyword_rest != null && !(node.keyword_rest instanceof Nodes.NoKeywordsParameterNode);
+    }
+
 }

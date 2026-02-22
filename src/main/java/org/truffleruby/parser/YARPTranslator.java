@@ -549,15 +549,15 @@ public class YARPTranslator extends YARPBaseTranslator {
                 environment.modulePath);
         newEnvironment.literalBlockPassedToMethod = literalBlockPassedToMethod;
 
-        final YARPBlockNodeTranslator methodCompiler = new YARPBlockNodeTranslator(
+        final YARPBlockNodeTranslator blockCompiler = new YARPBlockNodeTranslator(
                 newEnvironment,
                 arity,
                 parameters.block != null,
                 rubyWarnings);
 
-        methodCompiler.frameOnStackMarkerSlotStack = frameOnStackMarkerSlotStack;
+        blockCompiler.frameOnStackMarkerSlotStack = frameOnStackMarkerSlotStack;
 
-        final RubyNode rubyNode = methodCompiler.compileBlockNode(
+        final RubyNode rubyNode = blockCompiler.compileBlockNode(
                 body,
                 parameters,
                 parametersNode,
@@ -1853,10 +1853,7 @@ public class YARPTranslator extends YARPBaseTranslator {
 
         final RubyNode[] reloadSequence = reloadTranslator.reload(parametersNode);
 
-        boolean hasKeywords = parametersNode.keywords.length > 0 ||
-                (parametersNode.keyword_rest != null &&
-                        !(parametersNode.keyword_rest instanceof Nodes.NoKeywordsParameterNode));
-        var descriptor = hasKeywords
+        var descriptor = hasKeywordArguments(parametersNode)
                 ? KeywordArgumentsDescriptor.EMPTY
                 : NoKeywordArgumentsDescriptor.INSTANCE;
         final int restParamIndex = reloadTranslator.getRestParameterIndex();
@@ -3989,6 +3986,8 @@ public class YARPTranslator extends YARPBaseTranslator {
         // blocks only can have implicit rest parameter (|a,|)
         final boolean isImplicitRest = parametersNode.rest instanceof Nodes.ImplicitRestNode;
 
+        boolean rejectsKeywords = parametersNode.keyword_rest instanceof Nodes.NoKeywordsParameterNode;
+
         // NOTE: when ... parameter is present then YARP keeps ForwardingParameterNode in ParametersNode#keyword_rest field.
         //      So `parametersNode.keyword_rest != null` works correctly to check if there is a keyword rest argument.
         return new Arity(
@@ -3999,7 +3998,8 @@ public class YARPTranslator extends YARPBaseTranslator {
                 parametersNode.posts.length,
                 keywordArguments,
                 requiredKeywordArgumentsCount,
-                parametersNode.keyword_rest != null);
+                hasKeywordsRest(parametersNode),
+                rejectsKeywords);
     }
 
 }

@@ -10,6 +10,8 @@
 package org.truffleruby.language.arguments;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.nodes.Node;
+import org.truffleruby.RubyContext;
 import org.truffleruby.RubyLanguage;
 import org.truffleruby.core.array.ArrayUtils;
 import org.truffleruby.core.exception.RubyException;
@@ -50,12 +52,21 @@ public final class CheckKeywordArityNode extends RubyBaseNode {
     }
 
     private void checkKeywordArguments(RubyHash keywordArguments) {
+        if (arity.rejectsKeywords) {
+            throw noKeywordsAccepted(getContext(), this);
+        }
+
         if (checkExtraKeywordArgumentsNode == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             checkExtraKeywordArgumentsNode = insert(new CheckExtraKeywordArgumentsNode(getLanguage(), arity));
         }
 
         checkExtraKeywordArgumentsNode.check(keywordArguments);
+    }
+
+    @TruffleBoundary
+    public static RaiseException noKeywordsAccepted(RubyContext context, Node node) {
+        return new RaiseException(context, context.getCoreExceptions().argumentError("no keywords accepted", node));
     }
 
     private static final class CheckExtraKeywordArgumentsNode extends RubyBaseNode implements EachEntryCallback {

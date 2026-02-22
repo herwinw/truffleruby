@@ -15,7 +15,9 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.nodes.Node;
 import org.truffleruby.RubyContext;
 import org.truffleruby.RubyLanguage;
+import org.truffleruby.language.arguments.ArgumentsDescriptor;
 import org.truffleruby.language.arguments.CheckKeywordArityNode;
+import org.truffleruby.language.arguments.KeywordArgumentsDescriptor;
 import org.truffleruby.language.arguments.RubyArguments;
 import org.truffleruby.language.control.RaiseException;
 import org.truffleruby.language.control.ReturnID;
@@ -49,7 +51,7 @@ public abstract class RubyCheckArityRootNode extends RubyRootNode {
 
         this.arityForCheck = arityForCheck;
         this.keywordArguments = arityForCheck.acceptsKeywords();
-        this.checkKeywordArityNode = keywordArguments && !arityForCheck.hasKeywordsRest()
+        this.checkKeywordArityNode = arityForCheck.mustCheckKeywords()
                 ? new CheckKeywordArityNode(arityForCheck)
                 : null;
     }
@@ -63,12 +65,26 @@ public abstract class RubyCheckArityRootNode extends RubyRootNode {
                 checkArityProfile = true;
             }
 
-            throw checkArityError(arityForCheck, given, this);
+            throw checkArityErrorAndCheckRejectsKeywords(arityForCheck, given, RubyArguments.getDescriptor(frame));
         }
 
         if (checkKeywordArityNode != null) {
             checkKeywordArityNode.checkArity(frame);
         }
+    }
+
+    @TruffleBoundary
+    private RaiseException checkArityErrorAndCheckRejectsKeywords(Arity arity, int given,
+            ArgumentsDescriptor descriptor) {
+        // We consider `def m(**nil)` as not accepting keywords (since it ultimately does not and raises ArgumentError).
+        // That means `m(a: 1)` will give given=1 > max positional arguments (=0)
+        // So we handle the reject keywords case specially here to give the correct error message.
+        // Other cases are handled by CheckKeywordArityNode.
+        if (arity.rejectsKeywords && descriptor instanceof KeywordArgumentsDescriptor) {
+            return CheckKeywordArityNode.noKeywordsAccepted(getContext(), this);
+        }
+
+        return checkArityError(arity, given, this);
     }
 
     @TruffleBoundary

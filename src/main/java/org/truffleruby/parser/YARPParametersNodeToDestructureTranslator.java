@@ -18,7 +18,6 @@ import org.truffleruby.core.array.ArrayIndexNodes;
 import org.truffleruby.core.array.ArraySliceNodeGen;
 import org.truffleruby.core.hash.HashLiteralNode;
 import org.truffleruby.language.RubyNode;
-import org.truffleruby.language.arguments.CheckNoKeywordArgumentsNode;
 import org.truffleruby.language.arguments.ReadBlockOptionalArgumentFromArrayNode;
 import org.truffleruby.language.arguments.ReadKeywordArgumentNode;
 import org.truffleruby.language.arguments.ReadBlockPostArgumentFromArrayNode;
@@ -112,7 +111,7 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
             sequence.add(node.accept(this));
         }
 
-        if (parameters.keyword_rest != null) {
+        if (hasKeywordsRest(parameters)) {
             sequence.add(parameters.keyword_rest.accept(this));
         }
 
@@ -228,11 +227,6 @@ public final class YARPParametersNodeToDestructureTranslator extends YARPBaseTra
         // so immediately assign `{}` value
         final var valueNode = HashLiteralNode.create(RubyNode.EMPTY_ARRAY, language);
         return new WriteLocalVariableNode(slot, valueNode);
-    }
-
-    @Override
-    public RubyNode visitNoKeywordsParameterNode(Nodes.NoKeywordsParameterNode node) {
-        return new CheckNoKeywordArgumentsNode();
     }
 
     @Override

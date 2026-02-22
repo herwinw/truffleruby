@@ -45,7 +45,7 @@ public final class YARPReloadArgumentsTranslator extends YARPBaseTranslator {
             Nodes.ParametersNode parametersNode) {
         super(environment);
         this.yarpTranslator = yarpTranslator;
-        this.hasKeywordArguments = parametersNode.keywords.length > 0 || parametersNode.keyword_rest != null;
+        this.hasKeywordArguments = hasKeywordArguments(parametersNode);
     }
 
     public int getRestParameterIndex() {
@@ -121,7 +121,7 @@ public final class YARPReloadArgumentsTranslator extends YARPBaseTranslator {
             } else if (parameters.keyword_rest instanceof Nodes.NoKeywordsParameterNode) {
                 // do nothing
             } else if (parameters.keyword_rest instanceof Nodes.ForwardingParameterNode) {
-                // do nothing - it will be handled separately
+                // handled below
             } else {
                 throw CompilerDirectives.shouldNotReachHere();
             }

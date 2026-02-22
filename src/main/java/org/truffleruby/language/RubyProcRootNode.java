@@ -45,7 +45,7 @@ public final class RubyProcRootNode extends RubyRootNode {
             ReturnID returnID,
             Arity arityForCheck) {
         super(language, sourceSection, frameDescriptor, sharedMethodInfo, body, split, returnID);
-        this.checkKeywordArityNode = arityForCheck.hasKeywords() && !arityForCheck.hasKeywordsRest()
+        this.checkKeywordArityNode = arityForCheck.mustCheckKeywords()
                 ? new CheckKeywordArityNode(arityForCheck)
                 : null;
     }

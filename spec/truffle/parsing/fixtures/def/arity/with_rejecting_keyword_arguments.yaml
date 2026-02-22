@@ -22,18 +22,18 @@ ast: |
           flags = 1
           isDefSingleton = false
           name = "foo"
-          sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = true}, methodName = foo, blockDepth = 0, parseName = Object#foo, notes = null, argumentDescriptors = [ArgumentDescriptor(name = null, type = nokey)])
+          sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}, methodName = foo, blockDepth = 0, parseName = Object#foo, notes = null, argumentDescriptors = [ArgumentDescriptor(name = null, type = nokey)])
           sourceCharIndex = 0
           sourceLength = 18
       call targets:
           RubyMethodRootNode
               attributes:
-                  arityForCheck = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = true}
+                  arityForCheck = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}
                   callTarget = Object#foo
                   checkArityProfile = false
                   frameDescriptor = FrameDescriptor@...{#0:(self), #1:%$~_, #2:%method_block_arg}
                   instrumentationBits = 0
-                  keywordArguments = true
+                  keywordArguments = false
                   localReturnProfile = false
                   lock = java.util.concurrent.locks.ReentrantLock@...[Unlocked]
                   matchingReturnProfile = false
@@ -41,7 +41,7 @@ ast: |
                   polyglotRef = org.truffleruby.RubyLanguage@...
                   retryProfile = false
                   returnID = org.truffleruby.language.control.ReturnID@...
-                  sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = true}, methodName = foo, blockDepth = 0, parseName = Object#foo, notes = null, argumentDescriptors = [ArgumentDescriptor(name = null, type = nokey)])
+                  sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}, methodName = foo, blockDepth = 0, parseName = Object#foo, notes = null, argumentDescriptors = [ArgumentDescriptor(name = null, type = nokey)])
                   sourceSection = SourceSection(source=<parse_ast> [1:1 - 2:3], index=0, length=18, characters=def foo(**nil)\nend)
                   split = HEURISTIC
               children:
@@ -79,17 +79,16 @@ ast: |
                                           slot = 2
                                           sourceCharIndex = -1
                                           sourceLength = 0
-                                  CheckNoKeywordArgumentsNode
-                                      attributes:
-                                          flags = 0
-                                          sourceCharIndex = -1
-                                          sourceLength = 0
-                                      children:
-                                          readUserKeywordsHashNode =
-                                              ReadUserKeywordsHashNode
                                   NilLiteralNode
                                       attributes:
                                           flags = 0
                                           sourceCharIndex = -1
                                           sourceLength = 0
                               ]
+                  checkKeywordArityNode =
+                      CheckKeywordArityNode
+                          attributes:
+                              arity = Arity{preRequired = 0, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}
+                          children:
+                              readUserKeywordsHashNode =
+                                  ReadUserKeywordsHashNode

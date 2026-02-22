@@ -18,7 +18,7 @@ ast: |
           callTargets = ProcCallTargets(callTargetForProc = block in <top (required)>, callTargetForLambda = null, altCallTargetCompiler = ...$$Lambda$.../0x...@...)
           flags = 0
           frameOnStackMarkerSlot = 2
-          sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 2, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = true}, methodName = <top (required)>, blockDepth = 1, parseName = block in <top (required)>, notes = null, argumentDescriptors = [ArgumentDescriptor(name = a, type = req), ArgumentDescriptor(name = b, type = req), ArgumentDescriptor(name = null, type = nokey)])
+          sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 2, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}, methodName = <top (required)>, blockDepth = 1, parseName = block in <top (required)>, notes = null, argumentDescriptors = [ArgumentDescriptor(name = a, type = req), ArgumentDescriptor(name = b, type = req), ArgumentDescriptor(name = null, type = nokey)])
           sourceCharIndex = 5
           sourceLength = 20
           type = PROC
@@ -34,7 +34,7 @@ ast: |
                   redoProfile = false
                   retryProfile = false
                   returnID = org.truffleruby.language.control.ReturnID@...
-                  sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 2, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = true}, methodName = <top (required)>, blockDepth = 1, parseName = block in <top (required)>, notes = null, argumentDescriptors = [ArgumentDescriptor(name = a, type = req), ArgumentDescriptor(name = b, type = req), ArgumentDescriptor(name = null, type = nokey)])
+                  sharedMethodInfo = SharedMethodInfo(staticLexicalScope =  :: Object, arity = Arity{preRequired = 2, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}, methodName = <top (required)>, blockDepth = 1, parseName = block in <top (required)>, notes = null, argumentDescriptors = [ArgumentDescriptor(name = a, type = req), ArgumentDescriptor(name = b, type = req), ArgumentDescriptor(name = null, type = nokey)])
                   sourceSection = SourceSection(source=<parse_ast> [1:6 - 2:3], index=5, length=20, characters=do |a, b, **nil|\nend)
                   split = HEURISTIC
               children:
@@ -56,7 +56,7 @@ ast: |
                                               ShouldDestructureNode
                                                   attributes:
                                                       flags = 0
-                                                      keywordArguments = true
+                                                      keywordArguments = false
                                                       sourceCharIndex = -1
                                                       sourceLength = 0
                                                   children:
@@ -90,7 +90,7 @@ ast: |
                                                                                                   attributes:
                                                                                                       flags = 0
                                                                                                       index = 0
-                                                                                                      keywordArguments = true
+                                                                                                      keywordArguments = false
                                                                                                       missingArgumentBehavior = RUNTIME_ERROR
                                                                                                       sourceCharIndex = -1
                                                                                                       sourceLength = 0
@@ -141,7 +141,7 @@ ast: |
                                                                                       attributes:
                                                                                           flags = 0
                                                                                           index = 0
-                                                                                          keywordArguments = true
+                                                                                          keywordArguments = false
                                                                                           missingArgumentBehavior = NIL
                                                                                           sourceCharIndex = -1
                                                                                           sourceLength = 0
@@ -164,18 +164,10 @@ ast: |
                                                                                       attributes:
                                                                                           flags = 0
                                                                                           index = 1
-                                                                                          keywordArguments = true
+                                                                                          keywordArguments = false
                                                                                           missingArgumentBehavior = NIL
                                                                                           sourceCharIndex = -1
                                                                                           sourceLength = 0
-                                                          CheckNoKeywordArgumentsNode
-                                                              attributes:
-                                                                  flags = 0
-                                                                  sourceCharIndex = -1
-                                                                  sourceLength = 0
-                                                              children:
-                                                                  readUserKeywordsHashNode =
-                                                                      ReadUserKeywordsHashNode
                                                       ]
                                           thenBody =
                                               SequenceNode
@@ -251,14 +243,6 @@ ast: |
                                                                                           sourceCharIndex = -1
                                                                                           sourceLength = 0
                                                                                           type = FRAME_LOCAL
-                                                          CheckNoKeywordArgumentsNode
-                                                              attributes:
-                                                                  flags = 0
-                                                                  sourceCharIndex = -1
-                                                                  sourceLength = 0
-                                                              children:
-                                                                  readUserKeywordsHashNode =
-                                                                      ReadUserKeywordsHashNode
                                                       ]
                                   NilLiteralNode
                                       attributes:
@@ -266,3 +250,10 @@ ast: |
                                           sourceCharIndex = -1
                                           sourceLength = 0
                               ]
+                  checkKeywordArityNode =
+                      CheckKeywordArityNode
+                          attributes:
+                              arity = Arity{preRequired = 2, optional = 0, hasRest = false, isImplicitRest = false, postRequired = 0, keywordArguments = [], requiredKeywordArgumentsCount = 0, hasKeywordsRest = false}
+                          children:
+                              readUserKeywordsHashNode =
+                                  ReadUserKeywordsHashNode
