@@ -40,6 +40,7 @@ public final class Arity {
     private final boolean isImplicitRest;
     private final int postRequired;
     private final boolean hasKeywordsRest;
+    public final boolean rejectsKeywords;
     private final String[] keywordArguments;
     private final int requiredKeywordArgumentsCount;
     /** During parsing we cannot know if this Arity object belongs to proc or to lambda. So we calculate the arity
@@ -48,7 +49,7 @@ public final class Arity {
     private final int procArityNumber;
 
     public Arity(int preRequired, int optional, boolean hasRest) {
-        this(preRequired, optional, hasRest, false, 0, NO_KEYWORDS, 0, false);
+        this(preRequired, optional, hasRest, false, 0, NO_KEYWORDS, 0, false, false);
     }
 
     public Arity(
@@ -59,7 +60,8 @@ public final class Arity {
             int postRequired,
             String[] keywordArguments,
             int requiredKeywordArgumentsCount,
-            boolean hasKeywordsRest) {
+            boolean hasKeywordsRest,
+            boolean rejectsKeywords) {
         this.preRequired = preRequired;
         this.optional = optional;
         this.hasRest = hasRest;
@@ -70,6 +72,7 @@ public final class Arity {
         this.keywordArguments = keywordArguments;
         this.requiredKeywordArgumentsCount = requiredKeywordArgumentsCount;
         this.hasKeywordsRest = hasKeywordsRest;
+        this.rejectsKeywords = rejectsKeywords;
         this.arityNumber = computeArityNumber(false);
         this.procArityNumber = computeArityNumber(true);
 
@@ -85,7 +88,8 @@ public final class Arity {
                 postRequired,
                 keywordArguments,
                 requiredKeywordArgumentsCount,
-                hasKeywordsRest);
+                hasKeywordsRest,
+                rejectsKeywords);
     }
 
     public boolean checkPositionalArguments(int given) {
@@ -131,6 +135,10 @@ public final class Arity {
 
     public boolean hasKeywordsRest() {
         return hasKeywordsRest;
+    }
+
+    public boolean mustCheckKeywords() {
+        return (hasKeywords() && !hasKeywordsRest()) || rejectsKeywords;
     }
 
     public boolean allKeywordsOptional() {

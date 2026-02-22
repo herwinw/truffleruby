@@ -16,7 +16,6 @@ import java.util.Objects;
 import com.oracle.truffle.api.CompilerDirectives;
 import org.truffleruby.Layouts;
 import org.truffleruby.language.RubyNode;
-import org.truffleruby.language.arguments.CheckNoKeywordArgumentsNode;
 import org.truffleruby.language.arguments.MissingArgumentBehavior;
 import org.truffleruby.language.arguments.ReadKeywordArgumentNode;
 import org.truffleruby.language.arguments.ReadKeywordRestArgumentNode;
@@ -50,6 +49,7 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
     }
 
     private final Nodes.ParametersNode parameters;
+    private final boolean hasKeywordArguments;
     /** position of actual argument in a frame that is being evaluated/read to match a read node and actual argument */
     private int index = 0;
     /** to distinguish pre and post Nodes.RequiredParameterNode parameters */
@@ -70,6 +70,7 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
         this.isMethod = isMethod;
         this.yarpTranslator = yarpTranslator;
         this.parameters = Objects.requireNonNull(parameters);
+        this.hasKeywordArguments = hasKeywordArguments(parameters);
     }
 
     public RubyNode translate() {
@@ -128,7 +129,7 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
             sequence.add(node.accept(this));
         }
 
-        if (parameters.keyword_rest != null) {
+        if (hasKeywordsRest(parameters)) {
             sequence.add(parameters.keyword_rest.accept(this));
         }
 
@@ -153,11 +154,11 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
                     language,
                     new ReadPreArgumentNode(
                             index,
-                            hasKeywordArguments(),
+                            hasKeywordArguments,
                             isProc ? MissingArgumentBehavior.NIL : MissingArgumentBehavior.RUNTIME_ERROR));
         } else if (state == YARPLoadArgumentsTranslator.State.POST) {
             readNode = new ReadPostArgumentNode(-index, getRequiredCount(), getOptionalCount(), hasRest(),
-                    hasKeywordArguments());
+                    hasKeywordArguments);
         } else {
             throw CompilerDirectives.shouldNotReachHere();
         }
@@ -190,12 +191,12 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
                     language,
                     new ReadPreArgumentNode(
                             index,
-                            hasKeywordArguments(),
+                            hasKeywordArguments,
                             isProc ? MissingArgumentBehavior.NIL : MissingArgumentBehavior.RUNTIME_ERROR));
 
         } else if (state == YARPLoadArgumentsTranslator.State.POST) {
             readNode = new ReadPostArgumentNode(-index, getRequiredCount(), getOptionalCount(), hasRest(),
-                    hasKeywordArguments());
+                    hasKeywordArguments);
         } else {
             throw CompilerDirectives.shouldNotReachHere();
         }
@@ -231,7 +232,7 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
         readNode = new ReadOptionalArgumentNode(
                 index,
                 minimum,
-                hasKeywordArguments(),
+                hasKeywordArguments,
                 defaultValue);
 
         final int slot;
@@ -252,7 +253,7 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
 
         int from = parameters.requireds.length + parameters.optionals.length;
         int to = -parameters.posts.length;
-        readNode = new ReadRestArgumentNode(from, -to, hasKeywordArguments());
+        readNode = new ReadRestArgumentNode(from, -to, hasKeywordArguments);
 
         final int slot;
         if (node.name != null) {
@@ -287,11 +288,6 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
         }
 
         return new WriteLocalVariableNode(slot, readNode);
-    }
-
-    @Override
-    public RubyNode visitNoKeywordsParameterNode(Nodes.NoKeywordsParameterNode node) {
-        return new CheckNoKeywordArgumentsNode();
     }
 
     @Override
@@ -338,10 +334,6 @@ public final class YARPLoadArgumentsTranslator extends YARPBaseTranslator {
 
     private int getOptionalCount() {
         return parameters.optionals.length;
-    }
-
-    private boolean hasKeywordArguments() {
-        return parameters.keywords.length != 0 || parameters.keyword_rest != null;
     }
 
     private boolean hasRest() {
