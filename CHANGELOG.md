@@ -10,6 +10,7 @@ Bug fixes:
 * Update `search_nonascii()` to not rely on undefined behavior (#4110, @eregon).
 * Update to GraalVM & Truffle 25.0.2 (#4116, @eregon).
 * Fix `TypeError` from `Kernel#respond_to?` to show the class of the name argument and not self (@eregon).
+* Fix `super` with methods not accepting keywords like `def foo(**nil)` (#4168, @eregon).
 
 Compatibility:
 
