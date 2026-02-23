@@ -48,6 +48,7 @@ Compatibility:
 * Add support for creating `Float` values from strings with the decimal part omitted (#3883, @nirvdrum).
 * Implement `Method#original_name` (#4165, @eregon).
 * Add `Socket::ResolutionError` like Ruby 3.4 (#3883, @eregon).
+* Support the `resolv_timeout` and `fast_fallback` keyword arguments for `TCPSocket.new` (#3883, @eregon).
 
 Performance:
 

@@ -44,82 +44,14 @@ class TCPSocket < IPSocket
     [hostname, alternatives, family, *addresses]
   end
 
-  def initialize(host, service, local_host = nil, local_service = nil, connect_timeout: nil)
+  def initialize(host, port, local_host = nil, local_port = nil, connect_timeout: nil, resolv_timeout: nil, fast_fallback: Socket.tcp_fast_fallback)
+    socket = Socket.tcp(host, port, local_host, local_port, connect_timeout:, resolv_timeout:, fast_fallback:)
+    fd = socket.fileno
+    socket.autoclose = false
+    socket.close
+
     @no_reverse_lookup = Primitive.class(self).do_not_reverse_lookup
-
-    if host
-      host = Truffle::Socket.coerce_to_string(host)
-    end
-
-    if Primitive.is_a?(service, Integer)
-      service = service.to_s
-    else
-      service = Truffle::Socket.coerce_to_string(service)
-    end
-
-    local_addrinfo = nil
-
-    # When a local address and/or service/port are given we should bind the
-    # socket to said address (besides also connecting to the remote address).
-    if local_host or local_service
-      if local_host
-        local_host = Truffle::Socket.coerce_to_string(local_host)
-      end
-
-      if Primitive.is_a?(local_service, Integer)
-        local_service = local_service.to_s
-      elsif local_service
-        local_service = Truffle::Socket.coerce_to_string(local_service)
-      end
-
-      local_addrinfo = Socket
-        .getaddrinfo(local_host, local_service, :UNSPEC, :STREAM)
-    end
-
-    descriptor     = nil
-    connect_status = 0
-
-    # Because we don't know exactly what address family to bind to we'll just
-    # grab all the available ones and try every one of them, bailing out on the
-    # first address that we can connect to.
-    #
-    # This code is loosely based on the behaviour of CRuby's
-    # "init_inetsock_internal()" function as of Ruby 2.2.
-    Socket.getaddrinfo(host, service, :UNSPEC, :STREAM).each do |addrinfo|
-      _, port, address, _, family, socktype, protocol = addrinfo
-
-      descriptor = Truffle::Socket::Foreign.socket(family, socktype, protocol)
-
-      next if descriptor < 0
-
-      # If any local address details were given we should bind to one that
-      # matches the remote address connected to above.
-      if local_addrinfo
-        local_info = local_addrinfo.find do |addr|
-          addr[4] == family && addr[5] == socktype
-        end
-
-        if local_info
-          status = Truffle::Socket::Foreign
-            .bind(descriptor, Socket.sockaddr_in(local_info[1], local_info[2]))
-
-          Errno.handle('bind(2)') if status < 0
-        end
-      end
-
-      connect_status = Truffle::Socket::Foreign
-        .connect(descriptor, Socket.sockaddr_in(port, address), connect_timeout)
-
-      break if connect_status >= 0
-    end
-
-    if connect_status < 0
-      Truffle::Socket::Foreign.close(descriptor)
-
-      Errno.handle('connect(2)')
-    else
-      setup(descriptor, nil, true)
-      binmode
-    end
+    setup(fd, nil, true)
+    binmode
   end
 end
